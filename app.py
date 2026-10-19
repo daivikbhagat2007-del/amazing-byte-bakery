@@ -371,3 +371,22 @@ def admin_action(action):
     except (ValueError, KeyError, ArithmeticError, mysql.connector.Error):
         flash("Invalid input or duplicate entry.", "danger")
     return redirect(url_for("admin"))
+@app.route("/contact", methods=["GET", "POST"])
+def contact():
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip()
+        message = request.form.get("message", "").strip()
+
+        if name and email and message:
+            db(
+                "INSERT INTO contact_messages (name, email, message) VALUES (%s, %s, %s)",
+                (name, email, message),
+                write=True
+            )
+            flash("Your message has been sent successfully!", "success")
+            return redirect(url_for("contact"))
+
+        flash("Please fill in all fields.", "danger")
+
+    return render_template("contact.html")
